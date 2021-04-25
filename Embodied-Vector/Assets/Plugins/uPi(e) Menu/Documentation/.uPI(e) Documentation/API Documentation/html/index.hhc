@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML><HEAD></HEAD><BODY>
+<OBJECT type="text/site properties">
+<param name="FrameName" value="right">
+</OBJECT>
+<UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Classes"><param name="Local" value="annotated.html"><param name="ImageNumber" value="1"></OBJECT>
+  <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Class List"><param name="Local" value="annotated.html"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="uPIeMenu"><param name="Local" value="classu_p_ie_menu.html"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="AddButton"><param name="Local" value="classu_p_ie_menu.html#a99c870baad55e6fe26e3085ef2d56678"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="AddMenuOption"><param name="Local" value="classu_p_ie_menu.html#ad5da0c434e89f4253a4211cc4a095cb8"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ClearMenuOptions"><param name="Local" value="classu_p_ie_menu.html#a064a1b12b9b0c39bb1c901b123a4c203"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ConfirmCurrentSelection"><param name="Local" value="classu_p_ie_menu.html#a2d9dbcba3decd6660437d904159de19a"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Deselect"><param name="Local" value="classu_p_ie_menu.html#a12315c76dab6f5f68c0ba24b6a49bfe5"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="GetDirection"><param name="Local" value="classu_p_ie_menu.html#aa38ff71520298e75bec89dea96947ffa"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="GetEndDirection"><param name="Local" value="classu_p_ie_menu.html#a5a6648f69cdf1732384a006676f24f7e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="GetEndDirection"><param name="Local" value="classu_p_ie_menu.html#a447ce5ca421a98ddcdee2a5ff311028d"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="GetIndicatorPosition"><param name="Local" value="classu_p_ie_menu.html#aa20dd31041fcc85bf31aa51aa38908a5"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="GetIndicatorPosition"><param name="Local" value="classu_p_ie_menu.html#adcd6c9a5135ba598ea33c5e18f3471c9"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="GetStartDirection"><param name="Local" value="classu_p_ie_menu.html#aaa631a1571836aef437b946775bce83f"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="OpenSubMenu"><param name="Local" value="classu_p_ie_menu.html#a96e2a023d5a4735091bc1ebdf9540398"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="PollInput"><param name="Local" value="classu_p_ie_menu.html#ac4e43d44d17e6dfa41e6916113e5d7d4"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="RemoveIndicator"><param name="Local" value="classu_p_ie_menu.html#ae8795a4c4bdfc6ae31e071fb78af8cd3"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="RemoveMenuOption"><param name="Local" value="classu_p_ie_menu.html#a9dee68c8858ba1eaf644c8b5032fcfcb"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="RemoveMenuOption"><param name="Local" value="classu_p_ie_menu.html#a96f445d427e2b22c62ffec2ccf086d3b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ReturnToSuperMenu"><param name="Local" value="classu_p_ie_menu.html#ae96c2b54df2698ad8b62a6c8e454823e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="SelectRelatedOption"><param name="Local" value="classu_p_ie_menu.html#a4bdbd4ec1e5d3562f5585d08f9d6ed40"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="SelectRelatedOption"><param name="Local" value="classu_p_ie_menu.html#aa74ef890ca3249cdd6265d6b586e8475"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="BoundaryLength"><param name="Local" value="classu_p_ie_menu.html#a91d55104d264e2ca7261bdc116f55e15"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ButtonsFoldout"><param name="Local" value="classu_p_ie_menu.html#a63607b9a99f70706bdc589f328ff1510"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="DebugFoldout"><param name="Local" value="classu_p_ie_menu.html#a6b281d547584d858ecb6dd797bd10c6e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="DoDrawGizmos"><param name="Local" value="classu_p_ie_menu.html#a89ae76c9a7a59d050baf1dac5ff70ca9"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="DrawOnlyOnSelected"><param name="Local" value="classu_p_ie_menu.html#a36ff96cc4f9d7b8ed786e930fdaebc40"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="SelectedCircleSizeId"><param name="Local" value="classu_p_ie_menu.html#a11ac0927bdd34a45e5469b417d4225eb"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="SetCircleSizeDirectly"><param name="Local" value="classu_p_ie_menu.html#a1335db58d530c6e50d62b40029e2e1de"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="AlignForwardDirection"><param name="Local" value="classu_p_ie_menu.html#ae685c5da5fa98c49a7bdb5bfe1f5d057"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="AlignRadius"><param name="Local" value="classu_p_ie_menu.html#a2b777d71340f83520dc9894f862c77f5"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="AlignRotation"><param name="Local" value="classu_p_ie_menu.html#ad6b0cc54660c8fc78327ad403f208d8b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="AlignUpDirection"><param name="Local" value="classu_p_ie_menu.html#a025efdc4bdeca53ce713033babbebb26"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ApplyIndicatorRotation"><param name="Local" value="classu_p_ie_menu.html#a361f56c010ab2f69fef413d58294a0b0"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="CircleSize"><param name="Local" value="classu_p_ie_menu.html#aedf311a1c66403550be56d29c2725a80"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ConfirmButtonDown"><param name="Local" value="classu_p_ie_menu.html#aff5458105c854438ca8a888816980526"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ConfirmInputName"><param name="Local" value="classu_p_ie_menu.html#a61bb353de54ce4599ceac62ba5b55074"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ConstrainIndicatorPosition"><param name="Local" value="classu_p_ie_menu.html#a37182c8ee0684ec5f388d0599d7060c7"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ControllerDeadzone"><param name="Local" value="classu_p_ie_menu.html#a15a7aa79abf3e433b2e59d123505980e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="ControlWithGamepad"><param name="Local" value="classu_p_ie_menu.html#a60d088d7f2e6f8ce37e4838b38b21e42"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="CurrentDirection"><param name="Local" value="classu_p_ie_menu.html#ad5dc7601b189c53adbb1cb08b3a54731"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="CurrentlyActiveOption"><param name="Local" value="classu_p_ie_menu.html#a8812b18157784cd77744e6c665dcb8ed"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="CustomInput"><param name="Local" value="classu_p_ie_menu.html#ab2772b1664731a2bf16fe9765eccdebb"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="DefaultSelected"><param name="Local" value="classu_p_ie_menu.html#a192b97c2098a9510664b050272ce0861"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="DeselectOptionIfOutsideBorders"><param name="Local" value="classu_p_ie_menu.html#a5a27f1b47fb8c7a5fb532ddda699f2d7"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="EnableSelecting"><param name="Local" value="classu_p_ie_menu.html#a319b9453802917cae333bbda875d0dd2"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="HorizontalInputName"><param name="Local" value="classu_p_ie_menu.html#a813508abb80e42794adc051cb8c65c17"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="IndicatorGraphic"><param name="Local" value="classu_p_ie_menu.html#aa1daa09f1b6db918f3dacc1d79bfc908"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="MenuOptions"><param name="Local" value="classu_p_ie_menu.html#ad3f47f05943e0017184053d73a4e3baf"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="SelectedPieceId"><param name="Local" value="classu_p_ie_menu.html#a7f3a4b6b6ce0f91ef625299b96f0f6d9"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="StartDegOffset"><param name="Local" value="classu_p_ie_menu.html#a5e04d47cfc03dfb1b006d8c20180a7ce"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="UseCustomInputSystem"><param name="Local" value="classu_p_ie_menu.html#a6c4e3913a38d7e27e33eefc8b1503702"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="VerticalInputName"><param name="Local" value="classu_p_ie_menu.html#a847f72e3dab83e4f937a52ebc60cef24"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Class Index"><param name="Local" value="classes.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Class Hierarchy"><param name="Local" value="hierarchy.html"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="MonoBehaviour"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="uPIeMenu"><param name="Local" value="classu_p_ie_menu.html"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Class Members"><param name="Local" value="functions.html"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="All"><param name="Local" value="functions.html"><param name="ImageNumber" value="11"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Functions"><param name="Local" value="functions_func.html"><param name="ImageNumber" value="11"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Properties"><param name="Local" value="functions_prop.html"><param name="ImageNumber" value="11"></OBJECT>
+    </UL>
+  </UL>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,49 @@
+[OPTIONS]
+Compatibility=1.1
+Full-text search=Yes
+Contents file=index.hhc
+Default Window=main
+Default topic=index.html
+Index file=index.hhk
+Language=0x409 English (United States)
+Title="uPIe Menu - Radial Menu"
+
+[WINDOWS]
+main=""uPIe Menu - Radial Menu"","index.hhc","index.hhk","index.html","index.html",,,,,0x23520,,0x10387e,,,,,,,,0
+
+[FILES]
+classu_p_ie_menu.html
+classu_p_ie_menu-members.html
+dir_84bbf7b3c7f28a5a18725745e1505219.html
+dir_2a214042107656ef4056979595d34f35.html
+dir_c0005b12c1c6ae1cb8e9754bcab8bc3c.html
+dir_10c870f031ce6d5368ef8bc597de7831.html
+dir_656072ca4696a79eeedb006e3f3c6090.html
+index.html
+annotated.html
+classes.html
+hierarchy.html
+functions.html
+functions_func.html
+functions_prop.html
+tab_a.png
+tab_b.png
+tab_h.png
+tab_s.png
+nav_h.png
+nav_f.png
+bc_s.png
+doxygen.png
+closed.png
+open.png
+bdwn.png
+sync_on.png
+sync_off.png
+uPiMenuLogo.png
+doc.png
+folderopen.png
+folderclosed.png
+arrowdown.png
+arrowright.png
+splitbar.png
+classu_p_ie_menu.png

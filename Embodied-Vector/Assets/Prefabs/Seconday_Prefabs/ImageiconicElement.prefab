@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6047713414169321321
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6047713414169321301}
+  - component: {fileID: 6047713414169321322}
+  m_Layer: 0
+  m_Name: ImageiconicElement
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6047713414169321301
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6047713414169321321}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 753, y: 234, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6047713414169321322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6047713414169321321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d25450cf4bac064b8ce290ff5f97017, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mesh: {fileID: 0}
+  points: []
+  centroid: {x: 0, y: 0, z: 0}
+  radius: 0
+  radius_margin: 0
+  maxx: -100000
+  maxy: -100000
+  minx: 100000
+  miny: 100000
+  draggable_now: 0
+  icon_elem_material: {fileID: 2100000, guid: eed04dd1a9ac1ec41b0e758c4373d1bb, type: 2}
+  paintable_object: {fileID: 0}
+  icon_name: 
+  icon_number: 0
+  current_attribute: 0
+  previous_position: {x: 0, y: 0, z: 0}
+  recorded_path: []
+  hull_pts: []
+  record_path_enable: 0
+  position_before_record: {x: 0, y: 0, z: 0}
+  edge_position: {x: 0, y: 0, z: 0}
+  position_before_translation: {x: 0, y: 0, z: 0}
+  translation_path: []
+  path_index: 0
+  eps_path_radius: 10
+  has_continuous_path: 1
+  heightScale: 20
+  xScale: 100
+  max_possible_scale: 2
+  max_possible_rotation: 360
+  rotation_angle: 0
+  scale_value: 0
+  min_rotation_val: 0
+  max_rotation_val: 5
+  min_scale_val: 1
+  max_scale_val: 5
+  apply_rotation: 0
+  apply_scale: 0
+  pressureValues: []
+  widthcurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  is_this_double_function_operand: 0
+  details_dropdown: {fileID: 0}
+  global_details_on_path: 1
+  recognized_sprite: {fileID: 0}
