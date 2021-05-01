@@ -19,18 +19,9 @@ public class Edge
 }
 
 [Serializable]
-public class HyperOrSimplicialEdge
-{
-    public List<int> nodes;
-    public int weight;
-}
-
-[Serializable]
 public class Graph
 {
     public List<Edge> edges;
-    public List<HyperOrSimplicialEdge> simplicials;
-    public List<HyperOrSimplicialEdge> hyperedges;
     public List<int> nodes;
 }
 
@@ -38,6 +29,29 @@ public class Graph
 public class Graphs
 {
     public List<Graph> graphs;
+}
+
+[Serializable]
+public class Vector
+{
+    public int x;
+    public int y;
+    public float f_x;
+    public float f_y;
+}
+
+[Serializable]
+public class VectorField
+{
+    public int gridmaxx, gridmaxy, gridminx, gridminy;
+    public List<Vector> vectors;
+}
+
+[Serializable]
+public class single_cell
+{
+    public int x;
+    public int y;
 }
 
 [Serializable]

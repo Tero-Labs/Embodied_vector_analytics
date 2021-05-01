@@ -98,6 +98,14 @@ public class AllButtonsBehaviors : MonoBehaviour
             paint_canvas.GetComponent<Paintable>().color_picker.SetActive(true);
             paint_canvas.GetComponent<Paintable>().color_picker_script.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
         }
+
+        else if (this.name == "VectorFieldBrush")
+        {
+            enableAllPenObjectColliders();
+
+            paint_canvas.GetComponent<Paintable>().color_picker.SetActive(true);
+            paint_canvas.GetComponent<Paintable>().color_picker_script.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        }              
         
         else if (this.name == "Eraser")
         {
@@ -256,10 +264,13 @@ public class AllButtonsBehaviors : MonoBehaviour
 
         // incase any temp cylinder is left, we will clear them up 
         else if (this.name == "VectorBrush")
-        {
-            paint_canvas.GetComponent<Paintable>().DeleteEmptyEdgeObjects();
-
+        {            
             StartCoroutine(CorrectVectorEdges());
+        }
+
+        else if (this.name == "VectorFieldBrush")
+        {            
+            StartCoroutine(CorrectVectorFields());
         }
 
         else if (this.name == "Pan")
@@ -369,7 +380,7 @@ public class AllButtonsBehaviors : MonoBehaviour
             if (cur == null) continue;
             if (cur.GetComponent<iconicElementScript>() != null)
             {
-                if (cur.GetComponent<iconicElementScript>().points.Count < paint_canvas.GetComponent<Paintable>().min_point_count)
+                if (cur.GetComponent<iconicElementScript>().points.Count < Paintable.min_point_count)
                 {
                     Destroy(cur);
                 }
@@ -394,10 +405,10 @@ public class AllButtonsBehaviors : MonoBehaviour
     {
         yield return null;
 
-        foreach (GameObject cur in paint_canvas.GetComponent<Paintable>().new_drawn_edges)
+        foreach (GameObject cur in paint_canvas.GetComponent<Paintable>().new_drawn_vectors)
         {
             if (cur == null) continue;
-            if (cur.GetComponent<VectorElementScript>().points.Count < 2)
+            if (cur.transform.parent.tag == "objects_parent" && cur.GetComponent<VectorElementScript>().points.Count < Paintable.min_point_count)
             {
                 Destroy(cur);
             }
@@ -412,9 +423,34 @@ public class AllButtonsBehaviors : MonoBehaviour
         }
 
         yield return null;
-        paint_canvas.GetComponent<Paintable>().new_drawn_edges.Clear();
+        paint_canvas.GetComponent<Paintable>().new_drawn_vectors.Clear();
     }
-        
+
+    IEnumerator CorrectVectorFields()
+    {
+        yield return null;
+
+        foreach (GameObject cur in paint_canvas.GetComponent<Paintable>().new_drawn_vectorfields)
+        {
+            if (cur == null) continue;
+            if (cur.GetComponent<VectorFieldElement>().points.Count < Paintable.min_point_count)
+            {
+                Destroy(cur);
+            }
+            else if (cur.transform.childCount == 0)
+            {
+                Destroy(cur);
+            }
+            else
+            {
+                cur.GetComponent<VectorFieldElement>().points.Clear();
+            }
+        }
+
+        yield return null;
+        paint_canvas.GetComponent<Paintable>().new_drawn_vectorfields.Clear();
+    }
+
     IEnumerator CorrectFunctionLines()
     {
         yield return null;

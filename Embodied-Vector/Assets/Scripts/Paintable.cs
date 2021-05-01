@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.InputSystem;
@@ -21,7 +22,7 @@ public class Paintable : MonoBehaviour
     // PAN AND ZOOM RELATED PARAMETERS
     public Camera main_camera;
 	public float finger_move_tolerance = 100f;
-	private static float zoom_multiplier = 0.5f;
+	private static float zoom_multiplier = 1.5f;
 	public static float zoom_min = 200;
 	public static float zoom_max = 850;
 	public float pan_amount = 5f;
@@ -34,10 +35,6 @@ public class Paintable : MonoBehaviour
     public bool graphlocked;
     public bool directed_edge = false;
 
-    public bool vertex_add = true;
-    public bool vertex_del = false;
-    public bool edge_add = false;
-    public bool edge_del = false;
     public bool free_hand_edge = false;
 
     private Vector2 prev_move_pos;
@@ -47,8 +44,7 @@ public class Paintable : MonoBehaviour
     public GameObject IconicElement;
     public GameObject ImageIconicElement;
     public GameObject VectorElement;
-    public GameObject SimplicialEdgeElement;
-    public GameObject hyperEdgeElement;
+    public GameObject VectorFieldElement;
     public GameObject CombineLineElement;
     public GameObject FunctionLineElement;
     public GameObject GraphElement;
@@ -58,6 +54,7 @@ public class Paintable : MonoBehaviour
     public GameObject iconicElementButton;
     public static GameObject pan_button;
     public GameObject vector_pen_button;
+    public GameObject vector_field_pen_button;
     public GameObject eraser_button;
     public GameObject copy_button;
     public GameObject stroke_combine_button;
@@ -74,6 +71,7 @@ public class Paintable : MonoBehaviour
     public GameObject text_message_worldspace;
 
     public GameObject vectorline;
+    public GameObject vectorfieldline;
     public GameObject setline;
     public GameObject function_menu;
     public GameObject edge_radial_menu;
@@ -84,7 +82,7 @@ public class Paintable : MonoBehaviour
     // needed for drawing
     public GameObject templine;
 	public static int totalLines = 0;
-    public int min_point_count = 30;
+    static public int min_point_count = 30;
 
     // holder of all game objects
     public GameObject Objects_parent;
@@ -96,13 +94,11 @@ public class Paintable : MonoBehaviour
     public List<GameObject> selected_obj = new List<GameObject>();
     public GameObject edge_start, edge_end;
 
-    // simplicial edge paint control
-    public List<Vector3> SimplicialVertices = new List<Vector3>();
-    public List<GameObject> Simplicialnodes= new List<GameObject>();
-
-    // hyper edge paint control
-    public List<Vector3> hyperVertices = new List<Vector3>();
-    public List<GameObject> hypernodes = new List<GameObject>();
+    // needed for vector field
+    public int cell_width, cell_height;
+    public int total_width, total_height;
+    public int row_num, col_num;
+    public Dictionary<int, GameObject> gridcells;
 
     // needed for graph
     public static int graph_count = 0;
@@ -142,12 +138,12 @@ public class Paintable : MonoBehaviour
     // objects history
     public List<GameObject> history = new List<GameObject>();
     public List<GameObject> new_drawn_icons = new List<GameObject>();
-    public List<GameObject> new_drawn_edges = new List<GameObject>();
+    public List<GameObject> new_drawn_vectors = new List<GameObject>();
+    public List<GameObject> new_drawn_vectorfields = new List<GameObject>();
     public List<GameObject> new_drawn_function_lines = new List<GameObject>();
 
     // extra check for inputfields
     public static bool click_on_inputfield;
-
 
     // Action History
     public static bool ActionHistoryEnabled = false;
@@ -199,7 +195,14 @@ public class Paintable : MonoBehaviour
         dragged_arg_textbox = null;
         potential_tapped_graph = null;
 
-        vertex_add = true;
+        gridcells= new Dictionary<int, GameObject>();
+
+        cell_width = 50;
+        cell_height = 50;
+        total_width = (int)transform.GetComponent<Transform>().localScale.x;
+        total_height = (int)transform.GetComponent<Transform>().localScale.y;
+        row_num = (int)Mathf.Ceil(total_width / (float)cell_width);
+        col_num = (int)Mathf.Ceil(total_height / (float)cell_height);
     }
 
     // Update is called once per frame
@@ -707,104 +710,15 @@ public class Paintable : MonoBehaviour
         #region Vector Pen
         if (vector_pen_button.GetComponent<AllButtonsBehaviors>().selected)
         {
-            
-            if (PenTouchInfo.PressedThisFrame)//currentPen.tip.wasPressedThisFrame)
-            {
-                // start drawing a new line
-                var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-                RaycastHit Hit;
-
-                if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.tag == "paintable_canvas_object")
-                {
-                    Vector3 vec = Hit.point + new Vector3(0, 0, -40); // Vector3.up * 0.1f;
-
-                    vectorline = Instantiate(VectorElement, vec, Quaternion.identity, Objects_parent.transform);
-                    vectorline.name = "vector_" + selected_obj_count.ToString();
-                    vectorline.tag = "vector";
-
-                    selected_obj_count++;
-
-                    vectorline.GetComponent<VectorElementScript>().points.Add(vec);
-                    //CreateEmptyEdgeObjects();
-
-                    //https://generalistprogrammer.com/unity/unity-line-renderer-tutorial/
-                    LineRenderer l = vectorline.transform.GetComponent<LineRenderer>();
-                    l.material.SetColor("_Color", color_picker_script.color);
-
-                    new_drawn_edges.Add(vectorline);
-                    /*l.startWidth = 2f;
-                    l.endWidth = 2f;*/
-
-                    // set up the line renderer                    
-                    l.positionCount = 2;
-                    l.SetPosition(0, vec);// + new Vector3(0, 0, -2f));
-                    l.SetPosition(1, vec + new Vector3(1f, 0, -2f));
-                }
-
-            }
-
-            else if (PenTouchInfo.PressedNow)
-            {
-                // add points to the last line, but check that if an edge line has been created already
-                var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-                RaycastHit Hit;
-
-                if (vectorline != null && Physics.Raycast(ray, out Hit) && 
-                    (Hit.collider.gameObject.tag == "paintable_canvas_object"))
-                {
-                    Vector3 vec = Hit.point + new Vector3(0, 0, -5f); // Vector3.up * 0.1f;   
-                    vectorline.GetComponent<VectorElementScript>().points.Add(vec);
-                    vectorline.GetComponent<LineRenderer>().SetPosition(1, vec);// + new Vector3(0, 0, -2f));                    
-                }
-            }
-
-            else if (PenTouchInfo.ReleasedThisFrame)
-            {
-                var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-                RaycastHit Hit;
-
-                if (vectorline != null && Physics.Raycast(ray, out Hit) && (Hit.collider.gameObject.tag == "paintable_canvas_object"))
-                {                    
-                    if (vectorline.GetComponent<VectorElementScript>().points.Count > 2)
-                    {
-                        Vector3 vec = Hit.point + new Vector3(0, 0, -40);
-                        LineRenderer l = vectorline.transform.GetComponent<LineRenderer>();
-                        l.SetPosition(1, vec);
-
-                        vectorline.GetComponent<VectorElementScript>().directed_edge = true;// directed_edge;
-
-                        // set line renderer end point
-                        vectorline.GetComponent<VectorElementScript>().addEndPoint();
-
-                        //GraphCreation();
-
-                        // set everything back to null
-                        vectorline = null;
-                    }
-                    else
-                    {
-                        // delete the templine, not enough points
-                        Destroy(vectorline);
-                        vectorline = null;
-                        selected_obj_count--;
-                    }
-                                       
-                }
-                                
-                // in all other cases, to be safe, just delete the entire edgeline structure
-                else 
-                {
-                    Destroy(vectorline);
-                    vectorline = null;
-                    selected_obj_count--;
-                }
-
-                // the touch has ended, destroy all temp edge cylinders now
-                // DeleteEmptyEdgeObjects();
-            }
-
+            VectorCreation();
         }
+        #endregion
 
+        #region VectorField Pen
+        if (vector_field_pen_button.GetComponent<AllButtonsBehaviors>().selected)
+        {
+            VectorFieldCreation();
+        }
         #endregion
 
         // ERASER BRUSH
@@ -1003,145 +917,159 @@ public class Paintable : MonoBehaviour
             //if (no_func_menu_open == false) return;
             if (dragged_arg_textbox == null)
             {
-                OnGraphTap();
-
-                // normal operation
-                if (potential_tapped_graph == null)
+                
+                // normal operation                
+                if (PenTouchInfo.PressedThisFrame)//currentPen.tip.wasPressedThisFrame)
                 {
-                    if (PenTouchInfo.PressedThisFrame)//currentPen.tip.wasPressedThisFrame)
+                    // start drawing a new line
+                    var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+                    RaycastHit Hit;
+                    //Debug.Log("here");
+                    if (Physics.Raycast(ray, out Hit) &&
+                        (Hit.collider.gameObject.name == "Paintable" || Hit.collider.gameObject.tag == "video_player"))
                     {
-                        // start drawing a new line
-                        var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-                        RaycastHit Hit;
-                        //Debug.Log("here");
-                        if (Physics.Raycast(ray, out Hit) &&
-                            (Hit.collider.gameObject.name == "Paintable" || Hit.collider.gameObject.tag == "video_player"))
-                        {
-                            Debug.Log("instantiated_templine");
+                        Debug.Log("instantiated_templine");
 
-                            Vector3 vec = Hit.point + new Vector3(0, 0, -5f);
-                            functionline = Instantiate(FunctionLineElement, vec, Quaternion.identity, Objects_parent.transform);
+                        Vector3 vec = Hit.point + new Vector3(0, 0, -5f);
+                        functionline = Instantiate(FunctionLineElement, vec, Quaternion.identity, Objects_parent.transform);
 
-                            functionline.name = "function_line_" + function_count.ToString();
-                            function_count++;
-                            functionline.GetComponent<FunctionElementScript>().AddPoint(vec);
-                            functionline.GetComponent<FunctionElementScript>().paintable_object = transform.gameObject;
+                        functionline.name = "function_line_" + function_count.ToString();
+                        function_count++;
+                        functionline.GetComponent<FunctionElementScript>().AddPoint(vec);
+                        functionline.GetComponent<FunctionElementScript>().paintable_object = transform.gameObject;
 
-                            new_drawn_function_lines.Add(functionline);
-                            //function_menu.GetComponent<FunctionMenuScript>().text_label.GetComponent<TextMeshProUGUI>().text = "Brush loaded";
-                        }
+                        new_drawn_function_lines.Add(functionline);
+                        //function_menu.GetComponent<FunctionMenuScript>().text_label.GetComponent<TextMeshProUGUI>().text = "Brush loaded";
                     }
+                }
 
-                    else if (functionline != null &&
-                        PenTouchInfo.PressedNow //currentPen.tip.isPressed
-                        && (PenTouchInfo.penPosition -
-                        (Vector2)functionline.GetComponent<FunctionElementScript>().points[functionline.GetComponent<FunctionElementScript>().points.Count - 1]).magnitude > 0f)
+                else if (functionline != null &&
+                    PenTouchInfo.PressedNow //currentPen.tip.isPressed
+                    && (PenTouchInfo.penPosition -
+                    (Vector2)functionline.GetComponent<FunctionElementScript>().points[functionline.GetComponent<FunctionElementScript>().points.Count - 1]).magnitude > 0f)
+                {
+                    // add points to the last line
+                    var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+                    RaycastHit Hit;
+                    if (Physics.Raycast(ray, out Hit) &&
+                        (Hit.collider.gameObject.name == "Paintable" || Hit.collider.gameObject.tag == "video_player"))
                     {
-                        // add points to the last line
-                        var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-                        RaycastHit Hit;
-                        if (Physics.Raycast(ray, out Hit) &&
-                            (Hit.collider.gameObject.name == "Paintable" || Hit.collider.gameObject.tag == "video_player"))
-                        {
 
-                            Vector3 vec = Hit.point + new Vector3(0, 0, -5f); // Vector3.up * 0.1f;
+                        Vector3 vec = Hit.point + new Vector3(0, 0, -5f); // Vector3.up * 0.1f;
 
-                            functionline.GetComponent<TrailRenderer>().transform.position = vec;
-                            functionline.GetComponent<FunctionElementScript>().AddPoint(vec);
-                            //functionline.GetComponent<FunctionElementScript>().calculateLengthAttributeFromPoints();
+                        functionline.GetComponent<TrailRenderer>().transform.position = vec;
+                        functionline.GetComponent<FunctionElementScript>().AddPoint(vec);
+                        //functionline.GetComponent<FunctionElementScript>().calculateLengthAttributeFromPoints();
 
-                            // pressure based pen width
-                            functionline.GetComponent<FunctionElementScript>().updateLengthFromPoints();
-                            functionline.GetComponent<FunctionElementScript>().addPressureValue(PenTouchInfo.pressureValue);
-                            functionline.GetComponent<FunctionElementScript>().reNormalizeCurveWidth();
-                            functionline.GetComponent<TrailRenderer>().widthCurve = functionline.GetComponent<FunctionElementScript>().widthcurve;
+                        // pressure based pen width
+                        functionline.GetComponent<FunctionElementScript>().updateLengthFromPoints();
+                        functionline.GetComponent<FunctionElementScript>().addPressureValue(PenTouchInfo.pressureValue);
+                        functionline.GetComponent<FunctionElementScript>().reNormalizeCurveWidth();
+                        functionline.GetComponent<TrailRenderer>().widthCurve = functionline.GetComponent<FunctionElementScript>().widthcurve;
 
-                        }
                     }
+                }
 
-                    else if (functionline != null && PenTouchInfo.ReleasedThisFrame)
+                else if (functionline != null && PenTouchInfo.ReleasedThisFrame)
+                {
+                    var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+                    RaycastHit Hit;
+                    
+                    if (Physics.Raycast(ray, out Hit) &&
+                    (Hit.collider.gameObject.name == "Paintable" || Hit.collider.gameObject.tag == "video_player"))
                     {
-                        var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-                        RaycastHit Hit;
+                        if (functionline.GetComponent<FunctionElementScript>().points.Count > min_point_count)
+                        {
+                            int maxx = -100000, maxy = -100000, minx = 100000, miny = 100000;
+                            List<GameObject> selected_vectors = new List<GameObject>();
+                            GameObject[] vectorarray = GameObject.FindGameObjectsWithTag("vector");
 
-                        /*if (potential_tapped_graph == null)
-                        {*/
-                            if (Physics.Raycast(ray, out Hit) &&
-                            (Hit.collider.gameObject.name == "Paintable" || Hit.collider.gameObject.tag == "video_player"))
+                            functionline.GetComponent<FunctionElementScript>().vectorField = new VectorField();
+                            functionline.GetComponent<FunctionElementScript>().vectorField.vectors = new List<Vector>();
+
+                            for (int i = 0; i < vectorarray.Length; i++)
                             {
-                                if (functionline.GetComponent<FunctionElementScript>().points.Count > min_point_count)
+                                if (functionline.GetComponent<FunctionElementScript>().isInsidePolygon(
+                                        vectorarray[i].GetComponent<LineRenderer>().GetPosition(0)))//)
                                 {
+                                    selected_vectors.Add(vectorarray[i]);
+                                    int x = vectorarray[i].GetComponent<VectorElementScript>().x;
+                                    int y = vectorarray[i].GetComponent<VectorElementScript>().y;
 
-                                    List<GameObject> selected_icons = new List<GameObject>();
-                                    GameObject[] iconarray = GameObject.FindGameObjectsWithTag("iconic");
+                                    Vector vector = new Vector {
+                                        x = x,
+                                        y = y,
+                                        f_x = vectorarray[i].GetComponent<VectorElementScript>().f_x,
+                                        f_y = vectorarray[i].GetComponent<VectorElementScript>().f_y
+                                    };
+                                    functionline.GetComponent<FunctionElementScript>().vectorField.vectors.Add(vector);
 
-                                    for (int i = 0; i < iconarray.Length; i++)
-                                    {
-                                    
-                                        if (functionline.GetComponent<FunctionElementScript>().isInsidePolygon(
-                                                iconarray[i].GetComponent<iconicElementScript>().edge_position))//)
-                                        {
-                                            selected_icons.Add(iconarray[i]);
-                                                // MARKER: as everything is recalculated in functionmenuscript, we added break for fast op.
-                                                break;
-                                        }
-                                    }
+                                    if (maxx < x) maxx = x;
+                                    if (minx > x) minx = x;
 
-                                    //Debug.Log("found graph count in lasso: " + selected_graphs.Count.ToString());
-                                    if (selected_icons.Count == 0)
-                                    {
-                                        Destroy(functionline);
-                                        functionline = null;
-                                        function_count--;
-                                        return;
-                                    }
+                                    if (maxy < y) maxy = y;                                    
+                                    if (miny > y) miny = y;
 
-                                    var hullAPI = new HullAPI();
-                                    var hull = hullAPI.Hull2D(new Hull2DParameters()
-                                    { Points = functionline.GetComponent<FunctionElementScript>().points.ToArray(), Concavity = 3000 });
-
-                                    Vector3[] vertices = hull.vertices;
-
-                                    functionline.GetComponent<FunctionElementScript>().points = vertices.ToList();
-                                    functionline = transform.GetComponent<CreatePrimitives>().FinishFunctionLine(functionline);
-
-                                    functionline.GetComponent<FunctionElementScript>().InstantiateNameBox();
-
-                                    //StartCoroutine(HistoryModify(functionline));
-                                    //functionline.GetComponent<FunctionElementScript>().grapharray = selected_graphs.ToArray();
-                                    functionline = null;
-                                }
-                                else
-                                {
-                                    // delete the templine, not enough points
-                                    // Debug.Log("here_in_destroy");
-                                    Destroy(functionline);
-                                    functionline = null;
-                                    function_count--;
                                 }
                             }
-                            else
+
+                            //Debug.Log("found graph count in lasso: " + selected_graphs.Count.ToString());
+                            if (selected_vectors.Count == 0)
                             {
-                                // the touch didn't end on a line, destroy the line
-                                // Debug.Log("here_in_destroy_different_Hit");
                                 Destroy(functionline);
                                 functionline = null;
                                 function_count--;
+                                return;
                             }
-                        //}
-                        // vertex_add_interaction
-                        /*else
-                        {                            
+
+                            var hullAPI = new HullAPI();
+                            var hull = hullAPI.Hull2D(new Hull2DParameters()
+                            { Points = functionline.GetComponent<FunctionElementScript>().points.ToArray(), Concavity = 3000 });
+
+                            Vector3[] vertices = hull.vertices;
+
+                            functionline.GetComponent<FunctionElementScript>().points = vertices.ToList();
+                            functionline = transform.GetComponent<CreatePrimitives>().FinishFunctionLine(functionline);
+
+                            functionline.GetComponent<FunctionElementScript>().InstantiateNameBox();
+                            functionline.GetComponent<FunctionElementScript>().selected_vectors = selected_vectors;
+
+                            functionline.GetComponent<FunctionElementScript>().gridmaxx = maxx;
+                            functionline.GetComponent<FunctionElementScript>().gridminx = minx;
+                            functionline.GetComponent<FunctionElementScript>().gridmaxy = maxy;
+                            functionline.GetComponent<FunctionElementScript>().gridminy = miny;
+
+                            functionline.GetComponent<FunctionElementScript>().vectorField.gridmaxx = maxx;
+                            functionline.GetComponent<FunctionElementScript>().vectorField.gridminx = minx;
+                            functionline.GetComponent<FunctionElementScript>().vectorField.gridmaxy = maxy;
+                            functionline.GetComponent<FunctionElementScript>().vectorField.gridminy = miny;
+
+                            //File.WriteAllText("Assets/Resources/" + "data.json", JsonUtility.ToJson(functionline.GetComponent<FunctionElementScript>().vectorField));
+
+                            //StartCoroutine(HistoryModify(functionline));
+                            //functionline.GetComponent<FunctionElementScript>().grapharray = selected_graphs.ToArray();
+                            functionline = null;
+                            //selected_vectors.Clear();
                         }
-                        */
+                        else
+                        {
+                            // delete the templine, not enough points
+                            // Debug.Log("here_in_destroy");
+                            Destroy(functionline);
+                            functionline = null;
+                            function_count--;
+                        }
                     }
-                }
-                // interaction
-                else if (potential_tapped_graph != null && activeTouches.Count > 0)
-                {
+                    else
+                    {
+                        // the touch didn't end on a line, destroy the line
+                        // Debug.Log("here_in_destroy_different_Hit");
+                        Destroy(functionline);
+                        functionline = null;
+                        function_count--;
+                    }
                     
-                    OnGraphAdditionInteraction();
-                }                    
+                }                     
             }            
         }
 
@@ -1417,361 +1345,7 @@ public class Paintable : MonoBehaviour
         return temp;
     }
     
-    void OnGraphTap()
-    {
-        var activeTouches = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches;
-
-        if (activeTouches.Count == 0) return;
-        
-
-        if (activeTouches[0].phase == UnityEngine.InputSystem.TouchPhase.Moved && LastPhaseHappened != 1)
-        {
-            GameObject temp_stat = Instantiate(status_label_obj, canvas_radial.transform);
-
-            if (LastPhaseHappened != 1)
-            {
-                taping_flag = true;
-            }
-            LastPhaseHappened = 1;
-
-            startPos = activeTouches[0].screenPosition;
-            var ray = Camera.main.ScreenPointToRay(startPos);
-            RaycastHit Hit;
-
-            if (Physics.Raycast(ray, out Hit))
-            {
-                if (Hit.collider.gameObject.tag == "iconic")
-                {
-                    if (Hit.transform.parent.tag == "node_parent")
-                    {
-                        potential_tapped_graph = Hit.transform.parent.parent.gameObject;
-                        temp_stat.GetComponent<Status_label_text>().ChangeLabel("ptg: " + potential_tapped_graph.name);
-                    }
-                    else
-                    {
-                        potential_tapped_graph = null;
-                    }
-                }
-                else if (Hit.collider.gameObject.tag == "simplicial")
-                {
-                    potential_tapped_graph = Hit.transform.parent.parent.gameObject;
-                    temp_stat.GetComponent<Status_label_text>().ChangeLabel("ptg: " + potential_tapped_graph.name);
-                }
-            }
-
-            else
-            {
-                potential_tapped_graph = null;
-            }
-        }               
-                
-        else if (activeTouches[0].phase == UnityEngine.InputSystem.TouchPhase.Ended)
-        {
-            LastPhaseHappened = 3;
-            if (activeTouches[0].isTap == false) potential_tapped_graph = null;
-            taping_flag = false;
-            GameObject temp_stat = Instantiate(status_label_obj, canvas_radial.transform);
-            temp_stat.GetComponent<Status_label_text>().ChangeLabel("tapping finished");
-        }
-
-    }
-
-    void OnGraphAdditionInteraction()
-    {
-        /*int idx = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count - 1;
-
-        var currentTouch = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches[idx];*/
-
-        if (functionline == null && PenTouchInfo.PressedThisFrame
-           /* currentTouch.phase == UnityEngine.InputSystem.TouchPhase.Moved*/)
-        {
-            // start drawing a new line
-            //var ray = Camera.main.ScreenPointToRay(currentTouch.screenPosition);
-            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-            RaycastHit Hit;
-
-           
-            if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.name == "Paintable")
-            {
-                Debug.Log("instantiated_templine_with_tap");
-
-                Vector3 vec = Hit.point + new Vector3(0, 0, -5);
-                functionline = Instantiate(FunctionLineElement, vec, Quaternion.identity, Objects_parent.transform);
-
-                functionline.name = "function_line_" + function_count.ToString();
-                //function_count++;
-                functionline.GetComponent<FunctionElementScript>().AddPoint(vec);
-                functionline.GetComponent<FunctionElementScript>().paintable_object = transform.gameObject;
-
-                new_drawn_function_lines.Add(functionline);    
-            }
-        }
-
-        else if (functionline != null && PenTouchInfo.PressedNow
-            /*currentTouch.phase == UnityEngine.InputSystem.TouchPhase.Moved*/)
-        {
-            // add points to the last line
-            //var ray = Camera.main.ScreenPointToRay(currentTouch.screenPosition);
-            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-            RaycastHit Hit;
-            if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.name == "Paintable")
-            {
-
-                Vector3 vec = Hit.point + new Vector3(0, 0, -5); // Vector3.up * 0.1f;
-
-                functionline.GetComponent<TrailRenderer>().transform.position = vec;
-                functionline.GetComponent<FunctionElementScript>().AddPoint(vec);
-                functionline.GetComponent<FunctionElementScript>().calculateLengthAttributeFromPoints();
-
-                // pressure based pen width
-                functionline.GetComponent<FunctionElementScript>().updateLengthFromPoints();
-                functionline.GetComponent<FunctionElementScript>().addPressureValue(1);
-                functionline.GetComponent<FunctionElementScript>().reNormalizeCurveWidth();
-                functionline.GetComponent<TrailRenderer>().widthCurve = functionline.GetComponent<FunctionElementScript>().widthcurve;
-            }
-        }
-
-        else if (functionline != null && PenTouchInfo.ReleasedThisFrame
-            /*currentTouch.phase == UnityEngine.InputSystem.TouchPhase.Ended*/)
-        {
-            //var ray = Camera.main.ScreenPointToRay(currentTouch.screenPosition);
-            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
-            RaycastHit Hit;
-
-            // vertex_add_interaction            
-            if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.name == "Paintable")
-            {
-                if (functionline.GetComponent<FunctionElementScript>().points.Count > min_point_count)
-                {
-                    //Debug.Log("finished_templine_with_tap");
-
-                    
-                    if (vertex_add)
-                    {
-                        List<GameObject> selected_icons = new List<GameObject>();
-                        GameObject[] iconarray = GameObject.FindGameObjectsWithTag("iconic");
-
-                        for (int i = 0; i < iconarray.Length; i++)
-                        {
-                            // check if the lines are inside the drawn set polygon -- in respective local coordinates
-                            // we checked if the icon is inside the drawn lasso
-                            if (functionline.GetComponent<FunctionElementScript>().isInsidePolygon(iconarray[i].GetComponent<iconicElementScript>().edge_position))
-                            {
-                                selected_icons.Add(iconarray[i]);
-                            }
-                        }
-
-                        //Debug.Log("found graph count in lasso: " + selected_graphs.Count.ToString());
-                        if (selected_icons.Count == 0)
-                        {
-                            Destroy(functionline);
-                            functionline = null;
-                            return;
-                        }
-
-                        GameObject tempnodeparent = potential_tapped_graph.transform.GetChild(0).gameObject;
-                        GameObject tempedgeparent = potential_tapped_graph.transform.GetChild(1).gameObject;
-                        GameObject tempsimplicialparent = potential_tapped_graph.transform.GetChild(2).gameObject;
-                        GameObject temphyperparent = potential_tapped_graph.transform.GetChild(3).gameObject;
-
-                        //change_parent
-                        foreach (GameObject new_child_icon in selected_icons)
-                        {
-                            //change_parent 
-                            if (new_child_icon.transform.parent.tag != "node_parent")
-                            {
-                                new_child_icon.transform.parent = tempnodeparent.transform;
-                            }
-                            // if already in a graph, change parent of every siblings of it,but make sure not under the current graph
-                            else if (new_child_icon.transform.parent.parent != potential_tapped_graph.transform)
-                            {
-                                Transform Prev_node_parent = new_child_icon.transform.parent;
-                                Transform Prev_graph_parent = Prev_node_parent.parent;
-                                Transform Prev_edge_parent = Prev_graph_parent.GetChild(1);
-                                Transform Prev_simplicial_parent = Prev_graph_parent.GetChild(2);
-                                Transform Prev_hyper_parent = Prev_graph_parent.GetChild(3);
-                                Transform[] allChildrennode = Prev_node_parent.GetComponentsInChildren<Transform>();
-                                Transform[] allChildrenedge = Prev_edge_parent.GetComponentsInChildren<Transform>();
-                                Transform[] allChildrensimpli = Prev_simplicial_parent.GetComponentsInChildren<Transform>();
-                                Transform[] allChildrenhyper = Prev_hyper_parent.GetComponentsInChildren<Transform>();
-
-                                foreach (Transform child in allChildrennode)
-                                {
-                                    child.parent = tempnodeparent.transform;
-                                }
-
-                                foreach (Transform child in allChildrenedge)
-                                {
-                                    if (child.tag == "edge")
-                                        child.parent = tempedgeparent.transform;
-                                }
-
-                                foreach (Transform child in allChildrensimpli)
-                                {
-                                    if (child.tag == "simplicial")
-                                        child.parent = tempsimplicialparent.transform;
-                                }
-
-                                foreach (Transform child in allChildrenhyper)
-                                {
-                                    if (child.tag == "hyper")
-                                        child.parent = temphyperparent.transform;
-                                }
-
-                                Destroy(Prev_graph_parent.gameObject);
-                                Destroy(Prev_node_parent.gameObject);
-                                Destroy(Prev_edge_parent.gameObject);
-                                Destroy(Prev_simplicial_parent.gameObject);
-                                Destroy(Prev_hyper_parent.gameObject);
-                            }
-                        }
-
-                        potential_tapped_graph.GetComponent<GraphElementScript>().Graph_init();
-                        //potential_tapped_graph.GetComponent<GraphElementScript>().Graph_as_Str();
-
-                        Destroy(functionline);
-                        functionline = null;
-                    }
-
-                    else if (vertex_del)
-                    {
-                        GameObject tempnodeparent = potential_tapped_graph.transform.GetChild(0).gameObject;
-                        Transform[] allChildrennode = tempnodeparent.GetComponentsInChildren<Transform>();
-
-                        foreach (Transform child in allChildrennode)
-                        {
-                            if (child.tag != "iconic")
-                                continue;
-                            Debug.Log("checkfor_vertex_del:" + child.name);
-                            if (functionline.GetComponent<FunctionElementScript>().isInsidePolygon(child.GetComponent<iconicElementScript>().edge_position))
-                            {
-                                searchNodeAndDeleteEdge(child.gameObject);
-                                Destroy(child.gameObject);
-                            }
-                        }
-
-                        potential_tapped_graph.GetComponent<GraphElementScript>().Graph_init();
-                        //potential_tapped_graph.GetComponent<GraphElementScript>().Graph_as_Str();
-
-                        Destroy(functionline);
-                        functionline = null;
-                    }
-
-                    else if (edge_add)
-                    {
-                        List<string> selected_icons = new List<string>();
-                        GameObject tempnodeparent = potential_tapped_graph.transform.GetChild(0).gameObject;
-                        Transform[] allChildrennode = tempnodeparent.GetComponentsInChildren<Transform>();
-
-                        foreach (Transform child in allChildrennode)
-                        {
-                            if (child.tag != "iconic")
-                                continue;
-
-                            if (functionline.GetComponent<FunctionElementScript>().isInsidePolygon(child.GetComponent<iconicElementScript>().edge_position))
-                            {
-                                selected_icons.Add(child.GetComponent<iconicElementScript>().icon_number.ToString());
-                            }
-                        }
-
-                        if (selected_icons.Count == 0)
-                        {
-                            Destroy(functionline);
-                            functionline = null;
-                            return;
-                        }
-
-
-                        for (int i = 0; i < selected_icons.Count; i++)
-                        {
-                            for (int j = (i + 1); j < selected_icons.Count; j++)
-                            {
-                                List<string> icons = new List<string>();
-                                icons.Add(selected_icons[i]);
-                                icons.Add(selected_icons[j]);
-                                potential_tapped_graph.GetComponent<GraphElementScript>().EdgeCreation("edge", icons.ToArray(), 1);
-                            }
-                        }
-
-                        potential_tapped_graph.GetComponent<GraphElementScript>().edges_init();
-                        //potential_tapped_graph.GetComponent<GraphElementScript>().Graph_as_Str();
-
-                        Destroy(functionline);
-                        functionline = null;
-                    }
-
-                    else if (edge_del)
-                    {
-                        List<GameObject> selected_icons = new List<GameObject>();
-                        GameObject tempnodeparent = potential_tapped_graph.transform.GetChild(0).gameObject;
-                        Transform[] allChildrennode = tempnodeparent.GetComponentsInChildren<Transform>();
-
-                        foreach (Transform child in allChildrennode)
-                        {
-                            if (child.tag != "iconic")
-                                continue;
-                            Debug.Log("checkfor_vertex_del:" + child.name);
-                            if (functionline.GetComponent<FunctionElementScript>().isInsidePolygon(child.GetComponent<iconicElementScript>().edge_position))
-                            {
-                                selected_icons.Add(child.gameObject);
-                            }
-                        }
-
-                        if (selected_icons.Count == 0)
-                        {
-                            Destroy(functionline);
-                            functionline = null;
-                            return;
-                        }
-
-                        GameObject tempedgeparent = potential_tapped_graph.transform.GetChild(1).gameObject;
-                        Transform[] allChildrenedge = tempedgeparent.GetComponentsInChildren<Transform>();
-
-                        foreach (Transform child in allChildrenedge)
-                        {
-                            if (child.tag != "edge")
-                                continue;
-
-                            if (selected_icons.Contains(child.GetComponent<VectorElementScript>().edge_start) &&
-                                selected_icons.Contains(child.GetComponent<VectorElementScript>().edge_end))
-                            {
-                                Destroy(child.gameObject);
-                            }
-                        }
-
-                        potential_tapped_graph.GetComponent<GraphElementScript>().edges_init();
-                        //potential_tapped_graph.GetComponent<GraphElementScript>().Graph_as_Str();
-
-                        Destroy(functionline);
-                        functionline = null;
-                    }
-
-                    else
-                    {
-                        Destroy(functionline);
-                        functionline = null;
-                    }
-                }
-                else
-                {
-                    // delete the templine, not enough points
-                    // Debug.Log("here_in_destroy");
-                    Destroy(functionline);
-                    functionline = null;
-                }
-            }
-            else
-            {
-                // the touch didn't end on a line, destroy the line
-                // Debug.Log("here_in_destroy_different_Hit");
-                Destroy(functionline);
-                functionline = null;
-            }
-
-            potential_tapped_graph = null;
-        }
-    }
-
+    
     //https://stackoverflow.com/questions/38728714/unity3d-how-to-detect-taps-on-android
     void OnShortTap()
     {
@@ -1910,6 +1484,222 @@ public class Paintable : MonoBehaviour
         
 
                
+    }
+
+    void VectorFieldCreation()
+    {
+        if (PenTouchInfo.PressedThisFrame)
+        {
+            vectorfieldline = Instantiate(VectorFieldElement, Vector3.zero, 
+                Quaternion.identity, Objects_parent.transform);
+
+            new_drawn_vectorfields.Add(vectorfieldline);
+
+            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+            RaycastHit Hit;
+
+            if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.tag == "paintable_canvas_object")
+            {
+                Vector3 vec = Hit.point + new Vector3(0, 0, -40);
+                vectorfieldline.GetComponent<VectorFieldElement>().points.Add(vec);
+                vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos = vec;
+                
+            }
+        }
+
+        else if (vectorfieldline != null && PenTouchInfo.PressedNow)
+        {
+            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+            RaycastHit Hit;
+
+            if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.tag == "paintable_canvas_object")
+            {
+                Vector3 vec = Hit.point + new Vector3(0, 0, -40);
+
+                float dist = Vector3.Distance(vec, vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos);
+
+                if (dist > (vectorfieldline.GetComponent<VectorFieldElement>().magnitude + vectorfieldline.GetComponent<VectorFieldElement>().offset))
+                {
+                    vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos = vec;
+                    vectorfieldline.GetComponent<VectorFieldElement>().drawn = false;
+                }
+                else if (!vectorfieldline.GetComponent<VectorFieldElement>().drawn &&
+                    dist > vectorfieldline.GetComponent<VectorFieldElement>().magnitude)
+                {
+                    Vector3 temp_vec = vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos;
+                    single_cell temp_cell = new single_cell();
+                    temp_cell.x = (int)Mathf.Ceil((temp_vec.x + (total_width / 2)) / (float)cell_width);
+                    temp_cell.y = (int)Mathf.Ceil((temp_vec.y + (total_height / 2)) / (float)cell_height);
+
+                    // similar to 2d to 1d array conversion, we are saving a pointer with the vector
+                    int id = (Mathf.Max(temp_cell.x - 1, 0) * row_num) + temp_cell.y;
+
+                    /*Debug.Log("counter: " + id.ToString());
+                    Debug.Log("counter: " + temp_cell.x.ToString() + " " + temp_cell.y.ToString());*/
+
+                    //create a new vector
+                    vectorline = VectorCreation(vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos, vec, vectorfieldline);
+                    vectorfieldline.GetComponent<VectorFieldElement>().drawn = true;
+                    vectorline.GetComponent<VectorElementScript>().x = temp_cell.x;
+                    vectorline.GetComponent<VectorElementScript>().y = temp_cell.y;
+
+                    if (gridcells.ContainsKey(id))
+                    {
+                        Debug.Log("caught_ya");
+                        Destroy(gridcells[id]);
+
+                        gridcells[id] = vectorline;
+                        //return;
+                    }
+                    else
+                    {    
+                        gridcells.Add(id, vectorline);
+                    }
+
+                    // set everything back to null
+                    vectorline = null;
+                }
+
+                vectorfieldline.GetComponent<VectorFieldElement>().points.Add(vec);
+            }
+        }
+
+        else if (PenTouchInfo.ReleasedThisFrame)
+        {
+            vectorfieldline = null;
+        }
+    }
+
+    void VectorCreation()
+    {
+        if (PenTouchInfo.PressedThisFrame)//currentPen.tip.wasPressedThisFrame)
+        {
+            // start drawing a new line
+            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+            RaycastHit Hit;
+
+            if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.tag == "paintable_canvas_object")
+            {
+                Vector3 vec = Hit.point + new Vector3(0, 0, -40); // Vector3.up * 0.1f;
+
+                vectorline = Instantiate(VectorElement, vec, Quaternion.identity, Objects_parent.transform);
+                vectorline.name = "vector_" + selected_obj_count.ToString();
+                vectorline.tag = "vector";
+
+                selected_obj_count++;
+
+                vectorline.GetComponent<VectorElementScript>().points.Add(vec);
+                //CreateEmptyEdgeObjects();
+
+                //https://generalistprogrammer.com/unity/unity-line-renderer-tutorial/
+                LineRenderer l = vectorline.transform.GetComponent<LineRenderer>();
+                l.material.SetColor("_Color", color_picker_script.color);
+
+                new_drawn_vectors.Add(vectorline);
+                /*l.startWidth = 2f;
+                l.endWidth = 2f;*/
+
+                // set up the line renderer                    
+                l.positionCount = 2;
+                l.SetPosition(0, vec);// + new Vector3(0, 0, -2f));
+                l.SetPosition(1, vec + new Vector3(1f, 0, -2f));
+            }
+
+        }
+
+        else if (PenTouchInfo.PressedNow)
+        {
+            // add points to the last line, but check that if an edge line has been created already
+            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+            RaycastHit Hit;
+
+            if (vectorline != null && Physics.Raycast(ray, out Hit) &&
+                (Hit.collider.gameObject.tag == "paintable_canvas_object"))
+            {
+                Vector3 vec = Hit.point + new Vector3(0, 0, -5f); // Vector3.up * 0.1f;   
+                vectorline.GetComponent<VectorElementScript>().points.Add(vec);
+                vectorline.GetComponent<LineRenderer>().SetPosition(1, vec);// + new Vector3(0, 0, -2f));                    
+            }
+        }
+
+        else if (PenTouchInfo.ReleasedThisFrame)
+        {
+            var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
+            RaycastHit Hit;
+
+            if (vectorline != null && Physics.Raycast(ray, out Hit) && (Hit.collider.gameObject.tag == "paintable_canvas_object"))
+            {
+                if (vectorline.GetComponent<VectorElementScript>().points.Count > 2)
+                {
+                    Vector3 vec = Hit.point + new Vector3(0, 0, -40);
+                    LineRenderer l = vectorline.transform.GetComponent<LineRenderer>();
+                    l.SetPosition(1, vec);
+
+                    vectorline.GetComponent<VectorElementScript>().directed_edge = true;// directed_edge;
+
+                    // set line renderer end point
+                    vectorline.GetComponent<VectorElementScript>().addEndPoint();
+
+                    //GraphCreation();
+
+                    // set everything back to null
+                    vectorline = null;
+                }
+                else
+                {
+                    // delete the templine, not enough points
+                    Destroy(vectorline);
+                    vectorline = null;
+                    selected_obj_count--;
+                }
+
+            }
+
+            // in all other cases, to be safe, just delete the entire edgeline structure
+            else
+            {
+                Destroy(vectorline);
+                vectorline = null;
+                selected_obj_count--;
+            }
+
+            // the touch has ended, destroy all temp edge cylinders now
+            // DeleteEmptyEdgeObjects();
+        }
+
+    }
+
+    GameObject VectorCreation(Vector3 start, Vector3 end, GameObject vector_field)
+    {                        
+        vectorline = Instantiate(VectorElement, start, Quaternion.identity, vector_field.transform);
+        vectorline.name = "vector_" + selected_obj_count.ToString();
+        vectorline.tag = "vector";
+
+        selected_obj_count++;
+
+        vectorline.GetComponent<VectorElementScript>().points.Add(start);
+        //CreateEmptyEdgeObjects();
+
+        //https://generalistprogrammer.com/unity/unity-line-renderer-tutorial/
+        LineRenderer l = vectorline.transform.GetComponent<LineRenderer>();
+        l.material.SetColor("_Color", color_picker_script.color);
+
+        new_drawn_vectors.Add(vectorline);
+        /*l.startWidth = 2f;
+        l.endWidth = 2f;*/
+
+        // set up the line renderer                    
+        l.positionCount = 2;
+        l.SetPosition(0, start);
+        l.SetPosition(1, end);
+
+        vectorline.GetComponent<VectorElementScript>().directed_edge = true;// directed_edge;
+        // set line renderer end point
+        vectorline.GetComponent<VectorElementScript>().addEndPoint();
+
+        return vectorline;
+        // set everything back to null
+        vectorline = null;               
     }
 
     // normal simple graph
@@ -2338,63 +2128,7 @@ public class Paintable : MonoBehaviour
                 GameObject temp_stat = Instantiate(status_label_obj, canvas_radial.transform);
                 temp_stat.GetComponent<Status_label_text>().ChangeLabel("directed edge: " + directed_edge.ToString());
             }
-
-            if (Input.GetKeyUp(KeyCode.Alpha1) || Input.GetKeyUp(KeyCode.Keypad1))
-            {
-                vertex_add = !vertex_add;
-                if (vertex_add)
-                {
-                    vertex_del = false;
-                    edge_add = false;
-                    edge_del = false;
-                }
-
-                GameObject temp_stat = Instantiate(status_label_obj, canvas_radial.transform);
-                temp_stat.GetComponent<Status_label_text>().ChangeLabel("vertex addition: " + vertex_add.ToString());
-            }
-
-            if (Input.GetKeyUp(KeyCode.Alpha2) || Input.GetKeyUp(KeyCode.Keypad2))
-            {
-                vertex_del = !vertex_del;
-                if (vertex_del)
-                {
-                    vertex_add = false;
-                    edge_add = false;
-                    edge_del = false;
-                }
-
-                GameObject temp_stat = Instantiate(status_label_obj, canvas_radial.transform);
-                temp_stat.GetComponent<Status_label_text>().ChangeLabel("vertex deletion: " + vertex_del.ToString());
-            }
-
-            if (Input.GetKeyUp(KeyCode.Alpha3) || Input.GetKeyUp(KeyCode.Keypad3))
-            {
-                edge_add = !edge_add;
-                if (edge_add)
-                {
-                    vertex_add = false;
-                    vertex_del = false;
-                    edge_del = false;
-                }
-
-                GameObject temp_stat = Instantiate(status_label_obj, canvas_radial.transform);
-                temp_stat.GetComponent<Status_label_text>().ChangeLabel("edge addition: " + edge_add.ToString());
-            }
-
-            if (Input.GetKeyUp(KeyCode.Alpha4) || Input.GetKeyUp(KeyCode.Keypad4))
-            {
-                edge_del = !edge_del;
-                if (edge_del)
-                {
-                    vertex_add = false;
-                    vertex_del = false;
-                    edge_add = false;
-                }
-
-                GameObject temp_stat = Instantiate(status_label_obj, canvas_radial.transform);
-                temp_stat.GetComponent<Status_label_text>().ChangeLabel("edge deletion: " + edge_del.ToString());
-            }
-
+            
             //StartCoroutine(clearkeyboard());
            
 

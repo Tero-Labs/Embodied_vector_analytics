@@ -15,25 +15,7 @@ public class FunctionCaller : MonoBehaviour
 
     }
 
-    /*public void GetGraphStrings(GameObject[] selected_graphs)
-    {
-        graphs_as_string = "";
-        for (int i = 0; i < selected_graphs.Length; i++)
-        {
-            if (selected_graphs[i].tag != "graph") continue;
-
-            //selected_graphs[i].GetComponent<GraphElementScript>().Graph_as_Str();
-            graphs_as_string = graphs_as_string + selected_graphs[i].GetComponent<GraphElementScript>().nodes_str + "-" + 
-                selected_graphs[i].GetComponent<GraphElementScript>().edges_str + "-" +
-                selected_graphs[i].GetComponent<GraphElementScript>().simplicial_str + "-" +
-                selected_graphs[i].GetComponent<GraphElementScript>().hyper_edges_str + "+" ;
-        }
-        graphs_as_string = graphs_as_string.Remove(graphs_as_string.Length - 1);
-
-        Debug.Log("combined_string: " + graphs_as_string);
-        GetGraphJson(selected_graphs);
-    }*/
-
+    
     public void GetGraphJson(GameObject[] selected_graphs, string function_name)
     {
         this.selected_final_graphs = (GameObject[]) selected_graphs.Clone();
