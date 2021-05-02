@@ -19,6 +19,7 @@ public class FunctionElementScript : MonoBehaviour
 
     // enclosing vectors
     public List<GameObject> selected_vectors;
+    public Vector[,] spawnGrid;
 
     // for vector operation and server connection
     public VectorField vectorField;
@@ -77,7 +78,7 @@ public class FunctionElementScript : MonoBehaviour
     //public GameObject details_dropdown;
     public bool global_details_on_path = true;
     public bool fused_function;
-    public bool graph_generation_done;
+    public bool vector_analysis_done;
 
     public GameObject function_menu;
     public GameObject video_player;
@@ -100,7 +101,7 @@ public class FunctionElementScript : MonoBehaviour
     {
         //File.Delete("Assets/Resources/" + "output.json");
         File.Delete("Assets/Resources/" + "data.json");
-        graph_generation_done = true;
+        vector_analysis_done = true;
 
         if (video_player != null && 
             video_player.transform.parent.GetComponent<VideoPlayerChildrenAccess>().PlayorPause.GetComponent<VideoPlayPause>().playFlag)
@@ -140,6 +141,34 @@ public class FunctionElementScript : MonoBehaviour
         StartCoroutine(GameObject.Find("Paintable").GetComponent<Paintable>().HistoryModify(transform.gameObject));
     }
 
+    // https://forum.unity.com/threads/declaring-and-initializing-2d-arrays-in-c.52954/
+    public void InstantiateMatrix()
+    {
+        spawnGrid = new Vector[gridmaxx - gridminx + 1, gridmaxy - gridminy + 1];
+
+        for (int i = 0; i < gridmaxx - gridminx + 1; i++)
+        {
+            for (int j = 0; j < gridmaxy - gridminy + 1; j++)
+            {
+                spawnGrid[i, j] = new Vector
+                {
+                    x = i,
+                    y = j,
+                    f_x = 0,
+                    f_y = 0
+                };
+            }
+        }
+
+        int temp_i, temp_j;
+        foreach (Vector vector in vectorField.vectors)
+        {
+            temp_i = vector.x - gridminx;
+            temp_j = vector.y - gridminy;
+            spawnGrid[temp_i, temp_j] = vector;
+        }
+    }
+
     public void InstantiateNameBox()
     {
         //Instantiate(name_label, new Vector3(maxx, maxy, -5), Quaternion.identity, transform);
@@ -159,6 +188,54 @@ public class FunctionElementScript : MonoBehaviour
         Destroy(transform.GetChild(1).gameObject);
         
         transform.GetChild(0).GetComponent<FunctionMenuScript>().PostProcess(graph_as_Str);
+    }
+
+    // https://www.mathworks.com/help/matlab/ref/divergence.html
+    public void DivergenceCalculate()
+    {
+        float div_result_x = 0, div_result_y = 0;
+
+        // interior points
+        for (int i = 1; i < gridmaxx - gridminx; i++)
+        {
+            for (int j = 1; j < gridmaxy - gridminy; j++)
+            {
+                /*div_result_x = (spawnGrid[i + 1, j].f_x - spawnGrid[i - 1, j].f_x) /(float)(spawnGrid[i + 1, j].x - spawnGrid[i - 1, j].x);
+                div_result_y = (spawnGrid[i, j + 1].f_y - spawnGrid[i, j - 1].f_y) /(float)(spawnGrid[i, j + 1].y - spawnGrid[i, j - 1].y);*/
+                if ((spawnGrid[i, j + 1].x - spawnGrid[i, j - 1].x) > 0)
+                    div_result_x = (spawnGrid[i, j + 1].f_x - spawnGrid[i, j - 1].f_x) / (float)(spawnGrid[i, j + 1].x - spawnGrid[i, j - 1].x);
+                if ((spawnGrid[i + 1, j].y - spawnGrid[i - 1, j].y) > 0)
+                    div_result_y = (spawnGrid[i + 1, j].f_y - spawnGrid[i - 1, j].f_y) / (float)(spawnGrid[i + 1, j].y - spawnGrid[i - 1, j].y);
+            }
+        }
+
+        //  left and right edges        
+        for (int i = 0; i < gridmaxx - gridminx + 1; i++)
+        {                    
+            int j = 0;
+            //div_result_x = (spawnGrid[i + 1, j].f_x - spawnGrid[i, j].f_x) / (float)(spawnGrid[i + 1, j].x - spawnGrid[i, j].x);
+            if ((spawnGrid[i, j + 1].x - spawnGrid[i, j].x) > 0)
+                div_result_x = (spawnGrid[i, j + 1].f_x - spawnGrid[i, j].f_x) / (float)(spawnGrid[i, j + 1].x - spawnGrid[i, j].x);
+
+            j = gridmaxy - gridminy;
+            if ((spawnGrid[i, j].x - spawnGrid[i, j - 1].x) > 0)
+                div_result_x = (spawnGrid[i, j].f_x - spawnGrid[i, j - 1].f_x) / (float)(spawnGrid[i, j].x - spawnGrid[i, j - 1].x);
+        }
+
+        //  top and bottom edges        
+        for (int j = 0; j < gridmaxy - gridminy + 1; j++)
+        {
+            int i = 0;
+            //div_result_y = (spawnGrid[i, j + 1].f_y - spawnGrid[i, j].f_y) /(float)(spawnGrid[i, j + 1].y - spawnGrid[i, j].y);    
+            if ((spawnGrid[i + 1, j].y - spawnGrid[i, j].y) > 0)
+                div_result_y = (spawnGrid[i + 1, j].f_y - spawnGrid[i, j].f_y) / (float)(spawnGrid[i + 1, j].y - spawnGrid[i, j].y);
+
+            i = gridmaxx - gridminx;
+            if ((spawnGrid[i, j].y - spawnGrid[i - 1, j].y) > 0)
+                div_result_y = (spawnGrid[i, j].f_y - spawnGrid[i - 1, j].f_y) / (float)(spawnGrid[i, j].y - spawnGrid[i - 1, j].y);
+        }
+
+        InstantiateScalarOutput((div_result_x+div_result_y).ToString());
     }
 
     public void InstantiateScalarOutput(string output)

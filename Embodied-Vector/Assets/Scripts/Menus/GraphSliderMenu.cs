@@ -102,7 +102,7 @@ public class GraphSliderMenu : MonoBehaviour
         Transform cur_function_line = menu_object.transform.parent;
         menu_object.GetComponent<FunctionMenuScript>().InitiateFunctionCallHelper();
 
-        while (cur_function_line.GetComponent<FunctionElementScript>().graph_generation_done == false)
+        while (cur_function_line.GetComponent<FunctionElementScript>().vector_analysis_done == false)
         {
             //"waiting_until_i_am_finished_executing"
             yield return null;

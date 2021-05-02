@@ -44,15 +44,7 @@ public class FunctionMenuScript : MonoBehaviour
 
 
     // functions_list
-    private Dictionary<int,string> addition_dict;
-    private Dictionary<int, string> ego_graph_dict;
-
-    private Dictionary<int, string> topologicalsort_dict;
-    private Dictionary<int, string> shortestpath_dict;
-    private Dictionary<int, string> community_dict;
-
-    private Dictionary<int, string> dummy_dict;
-    //private Dictionary<int, int> dummy_order_dict;
+    private Dictionary<int,string> divergence_dict;
 
     private GameObject argument_text;
     public GameObject drag_text_ui;
@@ -101,43 +93,11 @@ public class FunctionMenuScript : MonoBehaviour
         basecolor = img.color;
 
         # region function arguments and types dictionary
-        addition_dict = new Dictionary<int, string>()
-        {
-            {0, "graph"},
-            {1, "graph"},
-        };
 
-        ego_graph_dict = new Dictionary<int, string>()
+        divergence_dict = new Dictionary<int, string>()
         {
-            {0, "graph"},
-            {1, "iconic"},
-            {2, "int"},
-        };
-
-        topologicalsort_dict = new Dictionary<int, string>()
-        {
-            {0, "graph"},
-            {1, "string"},
-        };
-
-        shortestpath_dict = new Dictionary<int, string>()
-        {
-            {0, "graph"},
-            {1, "iconic"},
-            {2, "iconic"},
-        };
-
-        community_dict = new Dictionary<int, string>()
-        {
-            {0, "graph"},
-        };
-
-        dummy_dict = new Dictionary<int, string>()
-        {
-            {0, "string"},
-            {1, "iconic"},
-        };
-
+            {0, "vectorfield"},
+        };    
 
         # endregion
     }
@@ -758,91 +718,16 @@ public class FunctionMenuScript : MonoBehaviour
             // ToDo: show red flag where no match
 
             // check if a valid function has been mapped, then inform paintable they can now instantiate drawing functions
-            if (input.text.ToLower().Equals("addition"))
+            if (input.text.ToLower().Equals("divergence"))
             {
                 match_found = true;
-                cur_dict = addition_dict;
+                cur_dict = divergence_dict;
                 //cur_order_dict = addition_order_dict;
                 
-                output_type = "graph";
-                input.text = "Addition";
-            }
-
-            else if (input.text.ToLower().Equals("egograph") || input.text.ToLower().Equals("neighborgraph"))
-            {
-                match_found = true;
-                cur_dict = ego_graph_dict;
-
-                output_type = "graph";
-
-                if (input.text.ToLower().Equals("egograph"))
-                {
-                    input.text = "EgoGraph";
-                }
-                else 
-                {
-                    input.text = "NeighborGraph";
-                }
-            }
-
-
-            else if (input.text.ToLower().Equals("topologicalsort") || input.text.ToLower().Equals("degreesort"))
-            {
-                match_found = true;
-                cur_dict = topologicalsort_dict;
-                //cur_order_dict = dummy_order_dict;
-
-                output_type = "graph";
-
-                if (input.text.ToLower().Equals("topologicalsort"))
-                {
-                    input.text = "TopologicalSort";
-                }
-                else
-                {
-                    input.text = "DegreeSort";
-                }
-            }
-
-            else if (input.text.ToLower().Equals("shortestpath"))
-            {
-                match_found = true;
-                cur_dict = shortestpath_dict;
-                //cur_order_dict = dummy_order_dict;
-
-                output_type = "graph";
-                input.text = "ShortestPath";
-            }
-
-            else if (input.text.ToLower().Equals("shortestpathlength"))
-            {
-                match_found = true;
-                cur_dict = shortestpath_dict;
-                //cur_order_dict = dummy_order_dict;
-
                 output_type = "scalar";
-                input.text = "ShortestPathLength";
+                input.text = "Divergence";
             }
             
-            else if (input.text.ToLower().Equals("community"))
-            {
-                match_found = true;
-                cur_dict = community_dict;
-                //cur_order_dict = dummy_order_dict;
-
-                output_type = "graph";
-                input.text = "Community";
-            }
-            
-            else if (input.text.ToLower().Equals("dummy"))
-            {
-                match_found = true;
-                cur_dict = dummy_dict;
-                //cur_order_dict = dummy_order_dict;
-
-                output_type = "scalar";
-            }
-
             if (match_found)
             {
                 cur_iter = 0;
@@ -851,7 +736,7 @@ public class FunctionMenuScript : MonoBehaviour
 
                 foreach (int key in cur_dict.Keys)
                 {
-                    if (cur_dict[key] == "graph")
+                    if (cur_dict[key] == "vectorfield")
                         cur_arg_Str.Add(key, "<sprite name=\"graph_box\">");
                     else if (cur_dict[key] == "iconic")
                         cur_arg_Str.Add(key, "<sprite name=\"node_box\">");
@@ -997,22 +882,29 @@ public class FunctionMenuScript : MonoBehaviour
         {
             transform.parent.GetComponent<FunctionElementScript>().InstantiateTopoGraph();
         }
-        else if (mainInputField.text.ToLower().Equals("shortestpath"))
-        {
-            transform.parent.GetComponent<FunctionElementScript>().InstantiatePathGraph();
-        }
-        else if (mainInputField.text.ToLower().Equals("community"))
-        {
-            Debug.Log("finished");
-            transform.parent.GetComponent<FunctionElementScript>().InstantiateCommunityGraph();
-        }
         else
         {
-            if (output_type == "graph") transform.parent.GetComponent<FunctionElementScript>().InstantiateGraph(); //(output);
+            if (output_type == "vector") transform.parent.GetComponent<FunctionElementScript>().InstantiateGraph(); //(output);
             else
             {
                 transform.parent.GetComponent<FunctionElementScript>().InstantiateScalarOutput(output);
             }
+        }
+
+        // moved to functionelementscript because the coroutine can not run if i hide the object 
+        //UIsetafterEval(output);
+    }
+
+    public void LocalFunctionEvaluate()
+    {
+        passive_func_call = false;
+        if (mainInputField.text.ToLower().Equals("topologicalsort") || mainInputField.text.ToLower().Equals("degreesort"))
+        {
+            transform.parent.GetComponent<FunctionElementScript>().InstantiateTopoGraph();
+        }
+        else if (mainInputField.text.ToLower().Equals("divergence"))
+        {
+            transform.parent.GetComponent<FunctionElementScript>().DivergenceCalculate();
         }
 
         // moved to functionelementscript because the coroutine can not run if i hide the object 
@@ -1063,6 +955,7 @@ public class FunctionMenuScript : MonoBehaviour
 
         if (passive_func_call == false)
         {
+            Debug.Log("hiding");
             // to enable calling again when it was called passively
             eval_finished = true;            
             transform.parent.GetComponent<FunctionElementScript>().mesh_holder.SetActive(false);
@@ -1085,14 +978,6 @@ public class FunctionMenuScript : MonoBehaviour
 
         if (Paintable.dragged_arg_textbox == transform.gameObject)
             Paintable.dragged_arg_textbox = null;
-
-        // need modification when it is scalar output based on whether the slider was called or not
-        /*if (output_type == "scalar")
-        {
-            message_box.GetComponent<TextMeshProUGUI>().text = "<color=\"black\">" + text_label.GetComponent<TextMeshProUGUI>().text;
-            text_label.GetComponent<TextMeshProUGUI>().text = output;
-        }    */
-
     }
 
     void ChildToggle(Toggle toggle)
@@ -1100,12 +985,6 @@ public class FunctionMenuScript : MonoBehaviour
         if (toggle.isOn) keep_child_object = true;
         else keep_child_object = false;
     }
-
-    /*void InstantEvalToggle(Toggle toggle)
-    {
-        if (toggle.isOn) instant_eval = true;
-        else instant_eval = false;
-    }*/
 
     void OnSettingsButton(Button settings)
     {
@@ -1158,8 +1037,8 @@ public class FunctionMenuScript : MonoBehaviour
         bool temp_flag = true;
         if (!eval_finished || self_call == null)
         {
-            
-            int idx = 0;
+            /*
+            int idx = 0;            
             foreach (GameObject child_graph in argument_objects)
             {
                 // if an argument is missing
@@ -1188,49 +1067,20 @@ public class FunctionMenuScript : MonoBehaviour
                     yield return null;
                     //argument_objects[idx] = cur_function_line.gameObject;
                 }
-
-                /*else if (child_graph.transform.parent.name.Contains("function_line_")
-                    && !child_graph.transform.parent.GetChild(0).GetComponent<FunctionMenuScript>().eval_finished)
-                {
-                    Transform cur_function_line = child_graph.transform.parent;
-                    cur_function_line.GetChild(0).GetComponent<FunctionMenuScript>().passive_func_call = passive_func_call;
-
-                    Debug.Log("child: " +
-                        cur_function_line.GetChild(0).GetComponent<FunctionMenuScript>().mainInputField.text.ToLower() +
-                        " called.");
-                    yield return StartCoroutine
-                        (cur_function_line.GetChild(0).GetComponent<FunctionMenuScript>().CheckUnevaluatedFunctionArguments());
-
-                    yield return null;
-                    //Debug.Log("child: " + cur_function_line.name);
-                    argument_objects[idx] = cur_function_line.GetChild(1).gameObject;
-                }
-                */
-                // it is already evaluated, hence just get the output
-                /*else if (child_graph.transform.parent.name.Contains("function_line_")
-                    && child_graph.transform.parent.GetChild(0).GetComponent<FunctionMenuScript>().eval_finished)
-                {
-                    Transform cur_function_line = child_graph.transform.parent;
-                    argument_objects[idx] = cur_function_line.GetChild(1).gameObject;
-                    //cur_function_line.GetChild(0).GetComponent<FunctionMenuScript>().UIsetafterEval("");
-                }*/
-
+                
                 idx++;
             }            
+            */
 
             if (temp_flag)
             {
-                transform.parent.GetComponent<FunctionElementScript>().graph_generation_done = false;
+                transform.parent.GetComponent<FunctionElementScript>().vector_analysis_done = false;                               
 
-                // setting the temp_graphs active to avoid possible conflicts
-                for (int i = 0; i < argument_objects.Length; i++)
-                {
-                    if (argument_objects[i].name == "temp_graph") argument_objects[i].SetActive(true);
-                }
+                // i_initiated
+                // transform.parent.GetComponent<FunctionCaller>().GetGraphJson(argument_objects, mainInputField.text.ToLower());
+                LocalFunctionEvaluate();
 
-                //i_initiated
-                transform.parent.GetComponent<FunctionCaller>().GetGraphJson(argument_objects, mainInputField.text.ToLower());
-                while (transform.parent.GetComponent<FunctionElementScript>().graph_generation_done == false)
+                while (transform.parent.GetComponent<FunctionElementScript>().vector_analysis_done == false)
                 {
                     Debug.Log("waiting_until_" + transform.parent.name + "_finished_executing");
                     yield return null;

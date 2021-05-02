@@ -1031,9 +1031,6 @@ public class Paintable : MonoBehaviour
                             functionline.GetComponent<FunctionElementScript>().points = vertices.ToList();
                             functionline = transform.GetComponent<CreatePrimitives>().FinishFunctionLine(functionline);
 
-                            functionline.GetComponent<FunctionElementScript>().InstantiateNameBox();
-                            functionline.GetComponent<FunctionElementScript>().selected_vectors = selected_vectors;
-
                             functionline.GetComponent<FunctionElementScript>().gridmaxx = maxx;
                             functionline.GetComponent<FunctionElementScript>().gridminx = minx;
                             functionline.GetComponent<FunctionElementScript>().gridmaxy = maxy;
@@ -1043,6 +1040,10 @@ public class Paintable : MonoBehaviour
                             functionline.GetComponent<FunctionElementScript>().vectorField.gridminx = minx;
                             functionline.GetComponent<FunctionElementScript>().vectorField.gridmaxy = maxy;
                             functionline.GetComponent<FunctionElementScript>().vectorField.gridminy = miny;
+
+                            functionline.GetComponent<FunctionElementScript>().InstantiateNameBox();
+                            functionline.GetComponent<FunctionElementScript>().InstantiateMatrix();
+                            functionline.GetComponent<FunctionElementScript>().selected_vectors = selected_vectors;
 
                             //File.WriteAllText("Assets/Resources/" + "data.json", JsonUtility.ToJson(functionline.GetComponent<FunctionElementScript>().vectorField));
 
@@ -1952,7 +1953,7 @@ public class Paintable : MonoBehaviour
                 history.RemoveAt(j);
             }
 
-            else if (history[j].GetComponent<FunctionElementScript>().graph_generation_done)
+            else if (history[j].GetComponent<FunctionElementScript>().vector_analysis_done)
             {
                 GameObject temp_func_item = Instantiate(first_item);
                 temp_func_item.transform.parent = history_list_viewer.transform;
