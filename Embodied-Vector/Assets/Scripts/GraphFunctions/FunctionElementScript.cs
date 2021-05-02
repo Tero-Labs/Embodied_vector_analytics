@@ -214,11 +214,11 @@ public class FunctionElementScript : MonoBehaviour
         {                    
             int j = 0;
             //div_result_x = (spawnGrid[i + 1, j].f_x - spawnGrid[i, j].f_x) / (float)(spawnGrid[i + 1, j].x - spawnGrid[i, j].x);
-            if ((spawnGrid[i, j + 1].x - spawnGrid[i, j].x) > 0)
+            if (gridmaxy != gridminy && (spawnGrid[i, j + 1].x - spawnGrid[i, j].x) > 0)
                 div_result_x = (spawnGrid[i, j + 1].f_x - spawnGrid[i, j].f_x) / (float)(spawnGrid[i, j + 1].x - spawnGrid[i, j].x);
 
             j = gridmaxy - gridminy;
-            if ((spawnGrid[i, j].x - spawnGrid[i, j - 1].x) > 0)
+            if (gridmaxy != gridminy && (spawnGrid[i, j].x - spawnGrid[i, j - 1].x) > 0)
                 div_result_x = (spawnGrid[i, j].f_x - spawnGrid[i, j - 1].f_x) / (float)(spawnGrid[i, j].x - spawnGrid[i, j - 1].x);
         }
 
@@ -227,11 +227,11 @@ public class FunctionElementScript : MonoBehaviour
         {
             int i = 0;
             //div_result_y = (spawnGrid[i, j + 1].f_y - spawnGrid[i, j].f_y) /(float)(spawnGrid[i, j + 1].y - spawnGrid[i, j].y);    
-            if ((spawnGrid[i + 1, j].y - spawnGrid[i, j].y) > 0)
+            if (gridmaxx != gridminx && (spawnGrid[i + 1, j].y - spawnGrid[i, j].y) > 0)
                 div_result_y = (spawnGrid[i + 1, j].f_y - spawnGrid[i, j].f_y) / (float)(spawnGrid[i + 1, j].y - spawnGrid[i, j].y);
 
             i = gridmaxx - gridminx;
-            if ((spawnGrid[i, j].y - spawnGrid[i - 1, j].y) > 0)
+            if (gridmaxx != gridminx && (spawnGrid[i, j].y - spawnGrid[i - 1, j].y) > 0)
                 div_result_y = (spawnGrid[i, j].f_y - spawnGrid[i - 1, j].f_y) / (float)(spawnGrid[i, j].y - spawnGrid[i - 1, j].y);
         }
 
