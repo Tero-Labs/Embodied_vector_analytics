@@ -1527,38 +1527,46 @@ public class Paintable : MonoBehaviour
                 else if (!vectorfieldline.GetComponent<VectorFieldElement>().drawn &&
                     dist > vectorfieldline.GetComponent<VectorFieldElement>().magnitude)
                 {
-                    Vector3 temp_vec = vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos;
-                    single_cell temp_cell = new single_cell();
-                    temp_cell.x = (int)Mathf.Ceil((temp_vec.x + (total_width / 2)) / (float)cell_width);
-                    temp_cell.y = (int)Mathf.Ceil((temp_vec.y + (total_height / 2)) / (float)cell_height);
-
-                    // similar to 2d to 1d array conversion, we are saving a pointer with the vector
-                    int id = (Mathf.Max(temp_cell.x - 1, 0) * row_num) + temp_cell.y;
-
-                    /*Debug.Log("counter: " + id.ToString());
-                    Debug.Log("counter: " + temp_cell.x.ToString() + " " + temp_cell.y.ToString());*/
-
-                    //create a new vector
-                    vectorline = VectorCreation(vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos, vec, vectorfieldline);
-                    vectorfieldline.GetComponent<VectorFieldElement>().drawn = true;
-                    vectorline.GetComponent<VectorElementScript>().x = temp_cell.x;
-                    vectorline.GetComponent<VectorElementScript>().y = temp_cell.y;
-
-                    if (gridcells.ContainsKey(id))
+                    
+                    // create a new vector                    
+                    // looping so that we can draw multiple vectors at the same time
+                    for (int iter = 0; iter < AllButtonsBehaviors.slider_width; iter++)
                     {
-                        Debug.Log("caught_ya");
-                        Destroy(gridcells[id]);
+                        vec = Hit.point + new Vector3(0, (cell_height + 10) * iter, -40);
+                        Vector3 temp_vec = vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos;
+                        temp_vec.y += (cell_height + 10) * iter;
 
-                        gridcells[id] = vectorline;
-                        //return;
-                    }
-                    else
-                    {    
-                        gridcells.Add(id, vectorline);
-                    }
+                        single_cell temp_cell = new single_cell();
+                        temp_cell.x = (int)Mathf.Ceil((temp_vec.x + (total_width / 2)) / (float)cell_width);
+                        temp_cell.y = (int)Mathf.Ceil((temp_vec.y + (total_height / 2)) / (float)cell_height);
 
-                    // set everything back to null
-                    vectorline = null;
+                        // similar to 2d to 1d array conversion, we are saving a pointer with the vector
+                        int id = (Mathf.Max(temp_cell.x - 1, 0) * row_num) + temp_cell.y;
+
+                        /*Debug.Log("counter: " + id.ToString());
+                        Debug.Log("counter: " + temp_cell.x.ToString() + " " + temp_cell.y.ToString());*/
+                        
+                        vectorline = VectorCreation(temp_vec, vec, vectorfieldline);
+                        vectorfieldline.GetComponent<VectorFieldElement>().drawn = true;
+                        vectorline.GetComponent<VectorElementScript>().x = temp_cell.x;
+                        vectorline.GetComponent<VectorElementScript>().y = temp_cell.y;
+
+                        if (gridcells.ContainsKey(id))
+                        {
+                            Debug.Log("caught_ya");
+                            Destroy(gridcells[id]);
+
+                            gridcells[id] = vectorline;
+                            //return;
+                        }
+                        else
+                        {
+                            gridcells.Add(id, vectorline);
+                        }
+
+                        // set everything back to null
+                        vectorline = null;
+                    }                    
                 }
 
                 vectorfieldline.GetComponent<VectorFieldElement>().points.Add(vec);

@@ -12,8 +12,10 @@ public class AllButtonsBehaviors : MonoBehaviour
 	public bool selected = false;
     public float width, height;
     public int macro_state_cnt;
+    public Slider vector_field_width;
 
     public Sprite record, play, normal;
+    public static int slider_width;
         
 	GameObject[] buttons;
     GameObject paint_canvas;
@@ -105,6 +107,7 @@ public class AllButtonsBehaviors : MonoBehaviour
 
             paint_canvas.GetComponent<Paintable>().color_picker.SetActive(true);
             paint_canvas.GetComponent<Paintable>().color_picker_script.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+            vector_field_width.transform.parent.gameObject.SetActive(true);
         }              
         
         else if (this.name == "Eraser")
@@ -269,7 +272,8 @@ public class AllButtonsBehaviors : MonoBehaviour
         }
 
         else if (this.name == "VectorFieldBrush")
-        {            
+        {
+            vector_field_width.transform.parent.gameObject.SetActive(false);
             StartCoroutine(CorrectVectorFields());
         }
 
@@ -363,6 +367,17 @@ public class AllButtonsBehaviors : MonoBehaviour
         width = transform.GetComponent<RectTransform>().sizeDelta.x * transform.GetComponent<RectTransform>().localScale.x;
         height = transform.GetComponent<RectTransform>().sizeDelta.y * transform.GetComponent<RectTransform>().localScale.y;
         macro_state_cnt = 0;
+
+        slider_width = 1;
+
+        if (vector_field_width != null)
+            vector_field_width.onValueChanged.AddListener(delegate { ChangeWidth(vector_field_width); });
+    }
+
+    public void ChangeWidth(Slider slider)
+    {
+        slider_width = (int)slider.value;
+        //Debug.Log(slider_width.ToString());
     }
 
     // Update is called once per frame
