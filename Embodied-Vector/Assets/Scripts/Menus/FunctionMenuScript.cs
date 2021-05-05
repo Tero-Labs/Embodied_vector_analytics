@@ -737,7 +737,8 @@ public class FunctionMenuScript : MonoBehaviour
                 foreach (int key in cur_dict.Keys)
                 {
                     if (cur_dict[key] == "vectorfield")
-                        cur_arg_Str.Add(key, "<sprite name=\"graph_box\">");
+                        cur_arg_Str.Add(key, transform.parent.GetComponent<FunctionElementScript>().selected_vectors[0].transform.parent.name);
+                        // cur_arg_Str.Add(key, "<sprite name=\"graph_box\">");
                     else if (cur_dict[key] == "iconic")
                         cur_arg_Str.Add(key, "<sprite name=\"node_box\">");
                     else

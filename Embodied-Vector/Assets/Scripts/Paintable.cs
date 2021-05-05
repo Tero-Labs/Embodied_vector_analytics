@@ -95,9 +95,10 @@ public class Paintable : MonoBehaviour
     public GameObject edge_start, edge_end;
 
     // needed for vector field
-    public int cell_width, cell_height;
-    public int total_width, total_height;
-    public int row_num, col_num;
+    public static int field_count;
+    public static int cell_width, cell_height;
+    public static int total_width, total_height;
+    public static int row_num, col_num;
     public Dictionary<int, GameObject> gridcells;
 
     // needed for graph
@@ -203,6 +204,8 @@ public class Paintable : MonoBehaviour
         total_height = (int)transform.GetComponent<Transform>().localScale.y;
         row_num = (int)Mathf.Ceil(total_width / (float)cell_width);
         col_num = (int)Mathf.Ceil(total_height / (float)cell_height);
+
+        field_count = 0;
     }
 
     // Update is called once per frame
@@ -1493,6 +1496,9 @@ public class Paintable : MonoBehaviour
         {
             vectorfieldline = Instantiate(VectorFieldElement, Vector3.zero, 
                 Quaternion.identity, Objects_parent.transform);
+
+            vectorfieldline.name = "F_" + field_count.ToString();
+            field_count++;
 
             new_drawn_vectorfields.Add(vectorfieldline);
 

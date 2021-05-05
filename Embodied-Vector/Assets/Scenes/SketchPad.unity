@@ -562,11 +562,11 @@ RectTransform:
   m_Father: {fileID: 1253876008}
   m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -500.1, y: -99.7}
-  m_SizeDelta: {x: 75.6, y: 20}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 15.600037, y: 105.680016}
+  m_SizeDelta: {x: 75.600006, y: 20}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &86345605
 GameObject:
   m_ObjectHideFlags: 0
@@ -739,12 +739,6 @@ MonoBehaviour:
   selected_obj: []
   edge_start: {fileID: 0}
   edge_end: {fileID: 0}
-  cell_width: 0
-  cell_height: 0
-  total_width: 0
-  total_height: 0
-  row_num: 0
-  col_num: 0
   startPos: {x: 0, y: 0}
   pen_dragged_obj: {fileID: 0}
   drag_prev_pos: {x: 0, y: 0, z: 0}
@@ -3659,7 +3653,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 302240324}
   m_HandleRect: {fileID: 302240323}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

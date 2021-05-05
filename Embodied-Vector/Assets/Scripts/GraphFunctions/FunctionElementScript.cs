@@ -150,13 +150,39 @@ public class FunctionElementScript : MonoBehaviour
         {
             for (int j = 0; j < gridmaxy - gridminy + 1; j++)
             {
-                spawnGrid[i, j] = new Vector
+                int temp_cell_x = gridminx + i;
+                int temp_cell_y = gridminy + j;                                               
+
+                // mapping the cell counters back to actual world cordinates
+                // temp_cell_x = (int)Mathf.Ceil((world_space_x + (total_width / 2)) / (float)cell_width);
+                float world_space_x = (temp_cell_x * Paintable.cell_width) - (Paintable.total_width / 2);
+
+                // temp_cell_y = (int)Mathf.Ceil((world_space_y + (total_height / 2)) / (float)cell_height);
+                float world_space_y = (temp_cell_y * Paintable.cell_height) - (Paintable.total_height / 2);
+
+                if(isInsidePolygon(new Vector3(world_space_x, world_space_y, -40)))
                 {
-                    x = i,
-                    y = j,
-                    f_x = 0,
-                    f_y = 0
-                };
+                    Debug.Log("cell inside function lasso");
+                    spawnGrid[i, j] = new Vector
+                    {
+                        x = i,
+                        y = j,
+                        f_x = 0,
+                        f_y = 0
+                    };
+                }
+                else
+                {
+                    Debug.Log("cell outside function lasso");
+                    spawnGrid[i, j] = new Vector
+                    {
+                        x = -1,
+                        y = -1,
+                        f_x = 0,
+                        f_y = 0
+                    };
+                }
+                
             }
         }
 
@@ -202,6 +228,11 @@ public class FunctionElementScript : MonoBehaviour
             {
                 /*div_result_x = (spawnGrid[i + 1, j].f_x - spawnGrid[i - 1, j].f_x) /(float)(spawnGrid[i + 1, j].x - spawnGrid[i - 1, j].x);
                 div_result_y = (spawnGrid[i, j + 1].f_y - spawnGrid[i, j - 1].f_y) /(float)(spawnGrid[i, j + 1].y - spawnGrid[i, j - 1].y);*/
+
+                // if outside lasso, need not calculate anything                 
+                if (spawnGrid[i, j + 1].x == -1 || spawnGrid[i, j - 1].x == -1)
+                    continue;
+
                 if ((spawnGrid[i, j + 1].x - spawnGrid[i, j - 1].x) > 0)
                     div_result_x = (spawnGrid[i, j + 1].f_x - spawnGrid[i, j - 1].f_x) / (float)(spawnGrid[i, j + 1].x - spawnGrid[i, j - 1].x);
                 if ((spawnGrid[i + 1, j].y - spawnGrid[i - 1, j].y) > 0)
@@ -214,10 +245,20 @@ public class FunctionElementScript : MonoBehaviour
         {                    
             int j = 0;
             //div_result_x = (spawnGrid[i + 1, j].f_x - spawnGrid[i, j].f_x) / (float)(spawnGrid[i + 1, j].x - spawnGrid[i, j].x);
+
+            // if outside lasso, need not calculate anything                 
+            if (spawnGrid[i, j + 1].x == -1 || spawnGrid[i, j].x == -1)
+                continue;
+
             if (gridmaxy != gridminy && (spawnGrid[i, j + 1].x - spawnGrid[i, j].x) > 0)
                 div_result_x = (spawnGrid[i, j + 1].f_x - spawnGrid[i, j].f_x) / (float)(spawnGrid[i, j + 1].x - spawnGrid[i, j].x);
 
             j = gridmaxy - gridminy;
+
+            // if outside lasso, need not calculate anything                 
+            if (spawnGrid[i, j - 1].x == -1 || spawnGrid[i, j].x == -1)
+                continue;
+
             if (gridmaxy != gridminy && (spawnGrid[i, j].x - spawnGrid[i, j - 1].x) > 0)
                 div_result_x = (spawnGrid[i, j].f_x - spawnGrid[i, j - 1].f_x) / (float)(spawnGrid[i, j].x - spawnGrid[i, j - 1].x);
         }
@@ -226,11 +267,21 @@ public class FunctionElementScript : MonoBehaviour
         for (int j = 0; j < gridmaxy - gridminy + 1; j++)
         {
             int i = 0;
-            //div_result_y = (spawnGrid[i, j + 1].f_y - spawnGrid[i, j].f_y) /(float)(spawnGrid[i, j + 1].y - spawnGrid[i, j].y);    
+            //div_result_y = (spawnGrid[i, j + 1].f_y - spawnGrid[i, j].f_y) /(float)(spawnGrid[i, j + 1].y - spawnGrid[i, j].y);  
+
+            // if outside lasso, need not calculate anything                 
+            if (spawnGrid[i + 1, j].y == -1 || spawnGrid[i, j].y == -1)
+                continue;
+
             if (gridmaxx != gridminx && (spawnGrid[i + 1, j].y - spawnGrid[i, j].y) > 0)
                 div_result_y = (spawnGrid[i + 1, j].f_y - spawnGrid[i, j].f_y) / (float)(spawnGrid[i + 1, j].y - spawnGrid[i, j].y);
 
             i = gridmaxx - gridminx;
+
+            // if outside lasso, need not calculate anything                 
+            if (spawnGrid[i - 1, j].y == -1 || spawnGrid[i, j].y == -1)
+                continue;
+
             if (gridmaxx != gridminx && (spawnGrid[i, j].y - spawnGrid[i - 1, j].y) > 0)
                 div_result_y = (spawnGrid[i, j].f_y - spawnGrid[i - 1, j].f_y) / (float)(spawnGrid[i, j].y - spawnGrid[i - 1, j].y);
         }
