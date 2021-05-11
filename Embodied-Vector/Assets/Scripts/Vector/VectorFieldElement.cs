@@ -13,8 +13,8 @@ public class VectorFieldElement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        width = 1;
-        magnitude = 50;
+        /*width = 1;
+        magnitude = 50;*/
         offset = 30;
     }
 

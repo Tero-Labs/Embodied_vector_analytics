@@ -13,9 +13,11 @@ public class AllButtonsBehaviors : MonoBehaviour
     public float width, height;
     public int macro_state_cnt;
     public Slider vector_field_width;
+    public Slider vector_field_magnitude;
 
     public Sprite record, play, normal;
     public static int slider_width;
+    public static int slider_magnitude;
         
 	GameObject[] buttons;
     GameObject paint_canvas;
@@ -107,7 +109,8 @@ public class AllButtonsBehaviors : MonoBehaviour
 
             paint_canvas.GetComponent<Paintable>().color_picker.SetActive(true);
             paint_canvas.GetComponent<Paintable>().color_picker_script.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            vector_field_width.transform.parent.gameObject.SetActive(true);
+            vector_field_width.transform.parent.parent.gameObject.SetActive(true);
+            //vector_field_magnitude.transform.parent.gameObject.SetActive(true);
         }              
         
         else if (this.name == "Eraser")
@@ -273,7 +276,8 @@ public class AllButtonsBehaviors : MonoBehaviour
 
         else if (this.name == "VectorFieldBrush")
         {
-            vector_field_width.transform.parent.gameObject.SetActive(false);
+            vector_field_width.transform.parent.parent.gameObject.SetActive(false);
+            //vector_field_magnitude.transform.parent.gameObject.SetActive(false);
             StartCoroutine(CorrectVectorFields());
         }
 
@@ -369,14 +373,24 @@ public class AllButtonsBehaviors : MonoBehaviour
         macro_state_cnt = 0;
 
         slider_width = 1;
+        slider_magnitude = 1;
 
         if (vector_field_width != null)
             vector_field_width.onValueChanged.AddListener(delegate { ChangeWidth(vector_field_width); });
+
+        if (vector_field_magnitude != null)
+            vector_field_magnitude.onValueChanged.AddListener(delegate { ChangeMagnitude(vector_field_magnitude); });
     }
 
     public void ChangeWidth(Slider slider)
     {
         slider_width = (int)slider.value;
+        //Debug.Log(slider_width.ToString());
+    }
+
+    public void ChangeMagnitude(Slider slider)
+    {
+        slider_magnitude = (int)slider.value;
         //Debug.Log(slider_width.ToString());
     }
 

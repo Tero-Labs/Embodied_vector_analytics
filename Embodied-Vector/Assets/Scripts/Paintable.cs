@@ -1505,6 +1505,8 @@ public class Paintable : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(PenTouchInfo.penPosition);
             RaycastHit Hit;
 
+            vectorfieldline.GetComponent<VectorFieldElement>().magnitude = AllButtonsBehaviors.slider_magnitude * 10;
+
             if (Physics.Raycast(ray, out Hit) && Hit.collider.gameObject.tag == "paintable_canvas_object")
             {
                 Vector3 vec = Hit.point + new Vector3(0, 0, -40);
@@ -1530,6 +1532,7 @@ public class Paintable : MonoBehaviour
                     vectorfieldline.GetComponent<VectorFieldElement>().last_drawn_pos = vec;
                     vectorfieldline.GetComponent<VectorFieldElement>().drawn = false;
                 }
+
                 else if (!vectorfieldline.GetComponent<VectorFieldElement>().drawn &&
                     dist > vectorfieldline.GetComponent<VectorFieldElement>().magnitude)
                 {
